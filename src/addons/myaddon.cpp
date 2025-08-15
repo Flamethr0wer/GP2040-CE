@@ -2,9 +2,12 @@
 #include "storagemanager.h"
 #include "config.pb.h"
 #include "helper.h"
+#include <iostream>
 
 bool MyAddon::available(){
+    stdio_init_all();
     return MY_ADDON_ENABLED && isValidPin(REED_SWITCH_PIN);
+    printf("available\n");
 }
 
 void MyAddon::setup(){
@@ -15,6 +18,7 @@ void MyAddon::setup(){
     lastPulseTime = 0;
     Gamepad * gamepad = Storage::getInstance().GetGamepad();
     gamepad->hasAnalogTriggers = true;
+    printf("setup\n");
 }
 
 void MyAddon::process(){
@@ -24,7 +28,7 @@ void MyAddon::process(){
     uint32_t now = getMillis();
 
     if(read == 1 && read != lastRead){
-        float rpm = 60000 / (now - lastPulseTime * 4);
+        float rpm = 60000 / ((now - lastPulseTime) * 4);
         gamepad->state.rt = int(rpm * 255 / MAX_RPM);
         lastPulseTime = now;
     }
@@ -33,4 +37,6 @@ void MyAddon::process(){
     if(now - lastPulseTime >= 2000){
         gamepad->state.rt = 0;
     }
+
+    printf("process\n");
 }
